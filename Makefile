@@ -6,8 +6,9 @@ OBJS_DIR  = objects
 HEADERS	:= -I ./include 
 CFLAGS = -Wall -Wextra -Werror -g 
 
-SRCS =	main.c \
-		$(SRC_DIR)/ft_atoi.c
+SRCS =	$(SRC_DIR)/main.c \
+		$(SRC_DIR)/ft_atoi.c \
+		$(SRC_DIR)/parse.c
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJS_DIR)/%.o)
 all: $(NAME)
@@ -18,7 +19,7 @@ $(OBJS_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -o $@ -c $< $(HEADERS)
 
 $(NAME): $(OBJS) 
-	@$(CC) $(OBJS)  $(HEADERS) $(LDFLAGS) -o $(NAME)
+	@$(CC) $(OBJS)  $(HEADERS) $(CFLAGS) -o $(NAME)
 
 clean:
 	rm -rf $(OBJS_DIR)

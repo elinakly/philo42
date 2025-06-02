@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "include/philo.h"
+#include "philo.h"
 
 int	main(int argc, char **argv)
 {
@@ -18,5 +18,5 @@ int	main(int argc, char **argv)
 
 	if (!ft_parse(&parse, argc, argv))
 		return (printf("Something wrong with arguments\n"), 1);
-
+	return (0);
 }

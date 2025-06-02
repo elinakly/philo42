@@ -30,6 +30,6 @@ typedef struct s_parse
 
 
 int		ft_atoi(const char *str);
-bool	ft_parse(t_parse *parse, int argc, char **argv)
+bool	ft_parse(t_parse *parse, int argc, char **argv);
 
 #endif

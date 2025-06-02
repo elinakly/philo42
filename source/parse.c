@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "include/philo.h"
+#include "../include/philo.h"
 
 bool	ft_parse(t_parse *parse, int argc, char **argv)
 {
-	if (argc != 5 || argc != 6)
+	if (argc != 5 && argc != 6)
 		return (false);
 	parse->nbr_of_philo = ft_atoi(argv[1]);
 	parse->time_to_die = ft_atoi(argv[2]);
