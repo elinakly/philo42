@@ -4,7 +4,7 @@ SRC_DIR = source
 OBJS_DIR  = objects
 
 HEADERS	:= -I ./include 
-CFLAGS = -Wall -Wextra -Werror -g 
+CFLAGS = -Wall -Wextra -Werror -g -pthread
 
 SRCS =	$(SRC_DIR)/main.c \
 		$(SRC_DIR)/ft_atoi.c \
