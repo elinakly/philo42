@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 20:29:26 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/04 20:41:56 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/06 17:26:42 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 
 void	*philo_does(void *args)
 {
-	t_philo  *philo_struct = (t_philo *)args;
+	t_philo	*philo_struct;
+
+	philo_struct = (t_philo *)args;
 	while (1)
 	{
 		printf("Philosopher %d is thinking\n", philo_struct->id);
@@ -58,7 +60,7 @@ bool	create_threads(t_parse	*parse, t_philo *philo_struct)
 bool	malloc_philo(t_parse	*parse, t_philo	**philo_struct)
 {
 	*philo_struct = malloc(sizeof(t_philo) * parse->nbr_of_philo);
-	if (!philo_struct)
+	if (!*philo_struct)
 		return (false);
 	return (true);
 }

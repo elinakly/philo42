@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 17:57:01 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/04 20:40:22 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/06 18:18:20 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,7 @@
 # include <stdbool.h>
 # include <limits.h>
 # include <pthread.h>
-
-# define EAT "is eating"
-# define SLEEP "is sleeping"
-# define FORK "has taken a fork"
-# define THINK "is thinking"
-# define DIE "DIED"
-# define LEFT 0
-# define RIGHT 1
-
+# include <sys/time.h>
 
 typedef struct s_parse
 {
@@ -49,10 +41,11 @@ typedef struct s_philo
 }	t_philo;
 
 
-int		ft_atoi(const char *str);
-bool	ft_parse(t_parse *parse, int argc, char **argv);
-bool	malloc_philo(t_parse	*parse, t_philo	**philo_struct);
-bool	create_threads(t_parse	*parse, t_philo *philo_struct);
-void	*philo_does(void *args);
+int			ft_atoi(const char *str);
+bool		ft_parse(t_parse *parse, int argc, char **argv);
+bool		malloc_philo(t_parse	*parse, t_philo	**philo_struct);
+bool		create_threads(t_parse	*parse, t_philo *philo_struct);
+void		*philo_does(void *args);
+long int	time_now(void);
 
 #endif
