@@ -29,11 +29,13 @@ typedef struct s_parse
 	ssize_t			time_to_sleep;
 	ssize_t			eats_time;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t	*print_mutex;
 }	t_parse;
 
 typedef struct s_philo
 {
 	int				id;
+	long long		last_meal;
 	pthread_t		thread;
 	t_parse			*params;
 	pthread_mutex_t	*left_fork;

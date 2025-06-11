@@ -12,6 +12,13 @@
 
 #include "philo.h"
 
+void print_routine(t_philo *philo_struct, const char *message)
+{
+	pthread_mutex_lock(philo_struct->params->print_mutex);
+	printf("%lld Philosopher %d %s\n", time_now() - philo_struct->last_meal, philo_struct->id, message);
+	pthread_mutex_unlock(philo_struct->params->print_mutex);
+}
+
 void	*philo_does(void *args)
 {
 	t_philo	*philo_struct;
@@ -19,14 +26,17 @@ void	*philo_does(void *args)
 	philo_struct = (t_philo *)args;
 	while (1)
 	{
-		printf("Philosopher %d is thinking\n", philo_struct->id);
+		print_routine(philo_struct, "is thinking");
+		philo_struct->last_meal = time_now();
 		pthread_mutex_lock(philo_struct->left_fork);
+		print_routine(philo_struct, "has taken a fork");
 		pthread_mutex_lock(philo_struct->right_fork);
+		print_routine(philo_struct, "has taken a fork");
 		printf("Philosopher %d is eating\n", philo_struct->id);
-		usleep(philo_struct->params->time_to_eat * 1000);
+		usleep(philo_struct->params->time_to_eat * 1000); 
 		pthread_mutex_unlock(philo_struct->right_fork);
 		pthread_mutex_unlock(philo_struct->left_fork);
-		printf("Philosopher %d is sleeping\n", philo_struct->id);
+		print_routine(philo_struct, "is sleeping");
 		usleep(philo_struct->params->time_to_sleep * 1000);
 	}
 	return (NULL);
