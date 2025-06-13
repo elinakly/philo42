@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 17:57:01 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/06 18:18:20 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/13 17:05:32 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ typedef struct s_parse
 	ssize_t			eats_time;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	*print_mutex;
+	long long		start_time;
+	pthread_t		death;
 }	t_parse;
 
 typedef struct s_philo
@@ -49,5 +51,6 @@ bool		malloc_philo(t_parse	*parse, t_philo	**philo_struct);
 bool		create_threads(t_parse	*parse, t_philo *philo_struct);
 void		*philo_does(void *args);
 long int	time_now(void);
+void		print_routine(t_philo *philo_struct, const char *message);
 
 #endif

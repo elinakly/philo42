@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 19:35:34 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/06 14:13:22 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/13 16:28:10 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,10 @@ bool	malloc_forks(t_parse *parse)
 	int	i;
 
 	parse->forks = malloc(sizeof(pthread_mutex_t) * parse->nbr_of_philo);
-	if (!parse->forks)
+	parse->print_mutex = malloc(sizeof(pthread_mutex_t));
+	if (!parse->forks || !parse->print_mutex)
+		return (false);
+	if (pthread_mutex_init(parse->print_mutex, NULL))
 		return (false);
 	i = 0;
 	while (i < parse->nbr_of_philo)
