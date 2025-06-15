@@ -43,7 +43,7 @@ int	main(int argc, char **argv)
 	if (!malloc_philo(&parse, &philo_struct))
 		return (printf("Something wrong with allocation\n"), cleanup(philo_struct, parse), 1);
 	if (!create_threads(&parse, philo_struct))
-		return (printf("Something wrong with threads\n"), cleanup(philo_struct, parse), 1);
+			return (printf("Something wrong with threads\n"), cleanup(philo_struct, parse), 1);
 	cleanup(philo_struct, parse);
 	return (0);
 }

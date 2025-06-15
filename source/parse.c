@@ -18,9 +18,12 @@ bool	malloc_forks(t_parse *parse)
 
 	parse->forks = malloc(sizeof(pthread_mutex_t) * parse->nbr_of_philo);
 	parse->print_mutex = malloc(sizeof(pthread_mutex_t));
-	if (!parse->forks || !parse->print_mutex)
+	parse->death_mutex = malloc(sizeof(pthread_mutex_t));
+	if (!parse->forks || !parse->print_mutex || !parse->death_mutex)
 		return (false);
 	if (pthread_mutex_init(parse->print_mutex, NULL))
+		return (false);
+	if (pthread_mutex_init(parse->death_mutex, NULL))
 		return (false);
 	i = 0;
 	while (i < parse->nbr_of_philo)
@@ -53,5 +56,6 @@ bool	ft_parse(t_parse *parse, int argc, char **argv)
 		return (false);
 	if (!malloc_forks(parse))
 		return (false);
+	parse->someone_died = false;
 	return (true);
 }

@@ -20,6 +20,7 @@
 # include <limits.h>
 # include <pthread.h>
 # include <sys/time.h>
+# include <string.h>
 
 typedef struct s_parse
 {
@@ -32,6 +33,8 @@ typedef struct s_parse
 	pthread_mutex_t	*print_mutex;
 	long long		start_time;
 	pthread_t		death;
+	pthread_mutex_t	*death_mutex;
+	bool			someone_died;
 }	t_parse;
 
 typedef struct s_philo
@@ -42,6 +45,7 @@ typedef struct s_philo
 	t_parse			*params;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
+	pthread_mutex_t *last_meal_mutex;
 }	t_philo;
 
 
