@@ -29,10 +29,10 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 void	print_routine(t_philo *philo_struct, const char *message)
 {
 	pthread_mutex_lock(philo_struct->params->death_mutex);
-	if (philo_struct->params->someone_died && ft_strncmp(message, "died", 4) != 0)
+	if (philo_struct->params->someone_died && ft_strncmp(message, "died", 4))
 	{
 		pthread_mutex_unlock(philo_struct->params->death_mutex);
-		return;
+		return ;
 	}
 	pthread_mutex_lock(philo_struct->params->print_mutex);
 	printf("%lld %d %s\n", time_now() - philo_struct->params->start_time,
@@ -43,10 +43,10 @@ void	print_routine(t_philo *philo_struct, const char *message)
 
 void	*death(void *args)
 {
-	int i;
-	i = 0;
 	t_philo	*philo_struct;
+	int		i;
 
+	i = 0;
 	philo_struct = (t_philo *)args;
 	while (1)
 	{
@@ -87,7 +87,7 @@ void	safe_usleep(t_parse *params, long long duration_ms)
 
 	start = time_now();
 	while (is_everyone_alive(params) && (time_now() - start < duration_ms))
-		usleep(100); // Sleep in small intervals to stay responsive
+		usleep(100);
 }
 
 void	*philo_does(void *args)
@@ -95,29 +95,10 @@ void	*philo_does(void *args)
 	t_philo	*philo_struct;
 
 	philo_struct = (t_philo *)args;
-	// if (philo_struct->id % 2 == 0)
-	// 	usleep(philo_struct->params->time_to_eat * 1000 / 2);
 	usleep((philo_struct->id % 2) * (philo_struct->params->time_to_eat * 1000 / 10));
-
 	while (is_everyone_alive(philo_struct->params))
 	{
-		//if (!is_everyone_alive(philo_struct->params))
-       // 	break;
 		print_routine(philo_struct, "is thinking");
-/*		if (philo_struct->id % 2 == 0)
-		{
-			pthread_mutex_lock(philo_struct->right_fork);
-			print_routine(philo_struct, "has taken a fork");
-			pthread_mutex_lock(philo_struct->left_fork);
-			print_routine(philo_struct, "has taken a fork");
-		}
-		else
-		{
-			pthread_mutex_lock(philo_struct->left_fork);
-			print_routine(philo_struct, "has taken a fork");
-			pthread_mutex_lock(philo_struct->right_fork);
-			print_routine(philo_struct, "has taken a fork");
-		}*/
 		pthread_mutex_lock(philo_struct->left_fork);
 		print_routine(philo_struct, "has taken a fork");
 		pthread_mutex_lock(philo_struct->right_fork);
@@ -141,8 +122,6 @@ bool	create_threads(t_parse	*parse, t_philo *philo_struct)
 
 	i = 0;
 	parse->start_time = time_now();
-	//if (pthread_mutex_init(parse->print_mutex, NULL))
-	//	return (false);
 	while (i < parse->nbr_of_philo)
 	{
 		philo_struct[i].id = i + 1;
