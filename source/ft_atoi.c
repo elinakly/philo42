@@ -23,7 +23,7 @@
 // 		i++;
 // 	if (str[i] == '+')
 // 		i++;
-// 	while (str[i] != '\0' && (str[i] >= '1' && str[i] <= '9'))
+// 	while (str[i] != '\0' && (str[i] >= '0' && str[i] <= '9'))
 // 	{
 // 		result = result * 10 + (str[i] - '0');
 // 		if (result > INT_MAX || result < INT_MIN)

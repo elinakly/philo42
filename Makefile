@@ -10,7 +10,8 @@ SRCS =	$(SRC_DIR)/main.c \
 		$(SRC_DIR)/ft_atoi.c \
 		$(SRC_DIR)/parse.c \
 		$(SRC_DIR)/threads.c \
-		$(SRC_DIR)/time.c
+		$(SRC_DIR)/time.c \
+		$(SRC_DIR)/utils.c 
 
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJS_DIR)/%.o)
 all: $(NAME)

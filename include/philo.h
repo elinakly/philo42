@@ -45,9 +45,9 @@ typedef struct s_philo
 	t_parse			*params;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
-	pthread_mutex_t *last_meal_mutex;
+	pthread_mutex_t	*last_meal_mutex;
 	ssize_t			have_eaten;
-	pthread_mutex_t *have_eaten_mutex;
+	pthread_mutex_t	*have_eaten_mutex;
 }	t_philo;
 
 
@@ -58,5 +58,8 @@ bool		create_threads(t_parse	*parse, t_philo *philo_struct);
 void		*philo_does(void *args);
 long int	time_now(void);
 void		print_routine(t_philo *philo_struct, const char *message);
-
+int			ft_strncmp(const char *s1, const char *s2, size_t n);
+bool		malloc_philo(t_parse	*parse, t_philo	**philo_struct);
+bool		is_everyone_alive(t_parse *params);
+void		safe_usleep(t_parse *params, long long duration_ms);
 #endif

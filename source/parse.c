@@ -41,7 +41,7 @@ bool	ft_parse(t_parse *parse, int argc, char **argv)
 	if (argc != 5 && argc != 6)
 		return (false);
 	parse->nbr_of_philo = ft_atoi(argv[1]);
-	if (parse->nbr_of_philo == 1)
+	if (parse->nbr_of_philo == 1 || parse->nbr_of_philo > 200)
 		return (false);
 	parse->time_to_die = ft_atoi(argv[2]);
 	parse->time_to_eat = ft_atoi(argv[3]);
