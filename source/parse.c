@@ -56,6 +56,6 @@ bool	ft_parse(t_parse *parse, int argc, char **argv)
 		return (false);
 	if (!malloc_forks(parse))
 		return (false);
-	parse->someone_died = false;
+	parse->terminate = false;
 	return (true);
 }

@@ -29,14 +29,19 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 void	print_routine(t_philo *philo_struct, const char *message)
 {
 	pthread_mutex_lock(philo_struct->params->death_mutex);
-	if (philo_struct->params->someone_died && ft_strncmp(message, "died", 4))
+	if (philo_struct->params->terminate && ft_strncmp(message, "died", 4)
+		&& ft_strncmp(message, "Eats Limit", 10))
 	{
 		pthread_mutex_unlock(philo_struct->params->death_mutex);
 		return ;
 	}
 	pthread_mutex_lock(philo_struct->params->print_mutex);
-	printf("%lld %d %s\n", time_now() - philo_struct->params->start_time,
-		philo_struct->id, message);
+	if (!ft_strncmp(message, "Eats Limit", 10))
+		printf("%lld %s\n", time_now() - philo_struct->params->start_time,
+			message);
+	else
+		printf("%lld %d %s\n", time_now() - philo_struct->params->start_time,
+			philo_struct->id, message);
 	pthread_mutex_unlock(philo_struct->params->print_mutex);
 	pthread_mutex_unlock(philo_struct->params->death_mutex);
 }
@@ -45,19 +50,26 @@ void	*death(void *args)
 {
 	t_philo	*philo_struct;
 	int		i;
+	int		done_eating;
 
-	i = 0;
 	philo_struct = (t_philo *)args;
 	while (1)
 	{
+		i = 0;
+		done_eating = 0;
 		while (i < (&philo_struct[0])->params->nbr_of_philo)
 		{
+			pthread_mutex_lock(philo_struct[i].have_eaten_mutex);
+			if (philo_struct[i].have_eaten >= philo_struct[i].params->eats_time)
+				done_eating++;
+			pthread_mutex_unlock(philo_struct[i].have_eaten_mutex);
 			pthread_mutex_lock(philo_struct[i].last_meal_mutex);
-			if ((time_now() - (&philo_struct[i])->last_meal > ((&philo_struct[i])->params->time_to_die)))
+			if ((time_now() - (&philo_struct[i])->last_meal
+					> ((&philo_struct[i])->params->time_to_die)))
 			{
 				pthread_mutex_unlock(philo_struct[i].last_meal_mutex);
 				pthread_mutex_lock(philo_struct->params->death_mutex);
-				philo_struct->params->someone_died = true;
+				philo_struct->params->terminate = true;
 				pthread_mutex_unlock(philo_struct->params->death_mutex);
 				print_routine(&philo_struct[i], "died");
 				return (NULL);
@@ -66,8 +78,16 @@ void	*death(void *args)
 				pthread_mutex_unlock(philo_struct[i].last_meal_mutex);
 			i++;
 		}
+		if (philo_struct[0].params->eats_time > 0 &&
+			done_eating == philo_struct[0].params->nbr_of_philo)
+		{
+			pthread_mutex_lock(philo_struct->params->death_mutex);
+			philo_struct->params->terminate = true;
+			pthread_mutex_unlock(philo_struct->params->death_mutex);
+			print_routine(&philo_struct[0], "Eats Limit");
+			return (NULL);
+		}
 		usleep(1000);
-		i = 0;
 	}
 }
 
@@ -76,7 +96,7 @@ bool	is_everyone_alive(t_parse *params)
 	bool	running;
 
 	pthread_mutex_lock(params->death_mutex);
-	running = !params->someone_died;
+	running = !params->terminate;
 	pthread_mutex_unlock(params->death_mutex);
 	return (running);
 }
@@ -95,19 +115,33 @@ void	*philo_does(void *args)
 	t_philo	*philo_struct;
 
 	philo_struct = (t_philo *)args;
-	usleep((philo_struct->id % 2) * (philo_struct->params->time_to_eat * 1000 / 10));
+	usleep((philo_struct->id % 2) * (philo_struct->params->time_to_eat
+			* 1000 / 10));
 	while (is_everyone_alive(philo_struct->params))
 	{
 		print_routine(philo_struct, "is thinking");
-		pthread_mutex_lock(philo_struct->left_fork);
-		print_routine(philo_struct, "has taken a fork");
-		pthread_mutex_lock(philo_struct->right_fork);
-		print_routine(philo_struct, "has taken a fork");
+		if (philo_struct->id % 2 == 0)
+		{
+			pthread_mutex_lock(philo_struct->right_fork);
+			print_routine(philo_struct, "has taken a fork");
+			pthread_mutex_lock(philo_struct->left_fork);
+			print_routine(philo_struct, "has taken a fork");
+		}
+		else
+		{
+			pthread_mutex_lock(philo_struct->left_fork);
+			print_routine(philo_struct, "has taken a fork");
+			pthread_mutex_lock(philo_struct->right_fork);
+			print_routine(philo_struct, "has taken a fork");
+		}
 		pthread_mutex_lock(philo_struct->last_meal_mutex);
 		philo_struct->last_meal = time_now();
 		pthread_mutex_unlock(philo_struct->last_meal_mutex);
 		print_routine(philo_struct, "is eating");
-		safe_usleep(philo_struct->params, philo_struct->params->time_to_eat); 
+		pthread_mutex_lock(philo_struct->have_eaten_mutex);
+		philo_struct->have_eaten++;
+		pthread_mutex_unlock(philo_struct->have_eaten_mutex);
+		safe_usleep(philo_struct->params, philo_struct->params->time_to_eat);
 		pthread_mutex_unlock(philo_struct->right_fork);
 		pthread_mutex_unlock(philo_struct->left_fork);
 		print_routine(philo_struct, "is sleeping");
@@ -128,12 +162,19 @@ bool	create_threads(t_parse	*parse, t_philo *philo_struct)
 		philo_struct[i].params = parse;
 		philo_struct[i].left_fork = &parse->forks[i];
 		philo_struct[i].last_meal = parse->start_time;
-		philo_struct[i].right_fork = &parse->forks[(i + 1) % parse->nbr_of_philo];
+		philo_struct[i].right_fork = &parse->forks[(i + 1)
+			% parse->nbr_of_philo];
 		philo_struct[i].last_meal_mutex = malloc(sizeof(pthread_mutex_t));
-		if (!philo_struct[i].last_meal_mutex ||
-			pthread_mutex_init(philo_struct[i].last_meal_mutex, NULL))
+		if (!philo_struct[i].last_meal_mutex
+			|| pthread_mutex_init(philo_struct[i].last_meal_mutex, NULL))
 			return (false);
-		if (pthread_create(&philo_struct[i].thread, NULL, philo_does, &philo_struct[i]))
+		philo_struct[i].have_eaten = 0;
+		philo_struct[i].have_eaten_mutex = malloc(sizeof(pthread_mutex_t));
+		if (!philo_struct[i].have_eaten_mutex
+			|| pthread_mutex_init(philo_struct[i].have_eaten_mutex, NULL))
+			return (false);
+		if (pthread_create(&philo_struct[i].thread, NULL,
+				philo_does, &philo_struct[i]))
 			return (false);
 		i++;
 	}

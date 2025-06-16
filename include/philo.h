@@ -34,7 +34,7 @@ typedef struct s_parse
 	long long		start_time;
 	pthread_t		death;
 	pthread_mutex_t	*death_mutex;
-	bool			someone_died;
+	bool			terminate;
 }	t_parse;
 
 typedef struct s_philo
@@ -46,6 +46,8 @@ typedef struct s_philo
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t *last_meal_mutex;
+	ssize_t			have_eaten;
+	pthread_mutex_t *have_eaten_mutex;
 }	t_philo;
 
 
