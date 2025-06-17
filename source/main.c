@@ -29,7 +29,6 @@ void	cleanup_struct(t_philo	*philo_struct, t_parse	parse)
 	}
 }
 
-
 void	cleanup(t_philo	*philo_struct, t_parse	parse)
 {
 	int	i;
@@ -64,11 +63,14 @@ int	main(int argc, char **argv)
 
 	philo_struct = NULL;
 	if (!ft_parse(&parse, argc, argv))
-		return (printf("Something wrong with arguments\n"), cleanup(philo_struct, parse), 1);
+		return (printf("Something wrong with arguments\n"),
+			cleanup(philo_struct, parse), 1);
 	if (!malloc_philo(&parse, &philo_struct))
-		return (printf("Something wrong with allocation\n"), cleanup(philo_struct, parse), 1);
+		return (printf("Something wrong with allocation\n"),
+			cleanup(philo_struct, parse), 1);
 	if (!create_threads(&parse, philo_struct))
-		return (printf("Something wrong with threads\n"), cleanup(philo_struct, parse), 1);
+		return (printf("Something wrong with threads\n"),
+			cleanup(philo_struct, parse), 1);
 	cleanup(philo_struct, parse);
 	return (0);
 }

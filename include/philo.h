@@ -62,4 +62,5 @@ int			ft_strncmp(const char *s1, const char *s2, size_t n);
 bool		malloc_philo(t_parse	*parse, t_philo	**philo_struct);
 bool		is_everyone_alive(t_parse *params);
 void		safe_usleep(t_parse *params, long long duration_ms);
+bool		died(t_philo	*philo_struct, int *done_eating, int i);
 #endif

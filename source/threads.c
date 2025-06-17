@@ -12,32 +12,10 @@
 
 #include "philo.h"
 
-bool	died(t_philo	*philo_struct, int *done_eating, int i)
-{
-	pthread_mutex_lock(&philo_struct[i].have_eaten_mutex);
-	if (philo_struct[i].have_eaten >= philo_struct[i].params->eats_time)
-		(*done_eating)++;
-	pthread_mutex_unlock(&philo_struct[i].have_eaten_mutex);
-	pthread_mutex_lock(&philo_struct[i].last_meal_mutex);
-	if (time_now() - philo_struct[i].last_meal
-		> philo_struct[i].params->time_to_die)
-	{
-		pthread_mutex_unlock(&philo_struct[i].last_meal_mutex);
-		pthread_mutex_lock(philo_struct->params->death_mutex);
-		philo_struct->params->terminate = true;
-		pthread_mutex_unlock(philo_struct->params->death_mutex);
-		print_routine(&philo_struct[i], "died");
-		return (false);
-	}
-	else
-		pthread_mutex_unlock(&philo_struct[i].last_meal_mutex);
-	return (true);
-}
-
 void	*death(void *args)
 {
-	t_philo	*philo_struct;
 	int		i;
+	t_philo	*philo_struct;
 	int		done_eating;
 
 	philo_struct = (t_philo *)args;
@@ -63,35 +41,41 @@ void	*death(void *args)
 	}
 }
 
+void	eating(t_philo	*philo_struct)
+{
+	if (philo_struct->id % 2 == 0)
+	{
+		pthread_mutex_lock(philo_struct->right_fork);
+		print_routine(philo_struct, "has taken a fork");
+		pthread_mutex_lock(philo_struct->left_fork);
+		print_routine(philo_struct, "has taken a fork");
+	}
+	else
+	{
+		pthread_mutex_lock(philo_struct->left_fork);
+		print_routine(philo_struct, "has taken a fork");
+		pthread_mutex_lock(philo_struct->right_fork);
+		print_routine(philo_struct, "has taken a fork");
+	}
+	pthread_mutex_lock(&philo_struct->last_meal_mutex);
+	philo_struct->last_meal = time_now();
+	pthread_mutex_unlock(&philo_struct->last_meal_mutex);
+	print_routine(philo_struct, "is eating");
+	safe_usleep(philo_struct->params, philo_struct->params->time_to_eat);
+}
+
 void	*philo_does(void *args)
 {
 	t_philo	*philo_struct;
 
 	philo_struct = (t_philo *)args;
-	usleep((philo_struct->id % 2) * (philo_struct->params->time_to_eat
-			* 1000 / 10));
+	// usleep((philo_struct->id % 2) * (philo_struct->params->time_to_eat
+	// 		* 1000));
+	usleep((philo_struct->id - 1) * 2000);
 	while (is_everyone_alive(philo_struct->params))
 	{
 		print_routine(philo_struct, "is thinking");
-		if (philo_struct->id % 2 == 0)
-		{
-			pthread_mutex_lock(philo_struct->right_fork);
-			print_routine(philo_struct, "has taken a fork");
-			pthread_mutex_lock(philo_struct->left_fork);
-			print_routine(philo_struct, "has taken a fork");
-		}
-		else
-		{
-			pthread_mutex_lock(philo_struct->left_fork);
-			print_routine(philo_struct, "has taken a fork");
-			pthread_mutex_lock(philo_struct->right_fork);
-			print_routine(philo_struct, "has taken a fork");
-		}
-		pthread_mutex_lock(&philo_struct->last_meal_mutex);
-		philo_struct->last_meal = time_now();
-		pthread_mutex_unlock(&philo_struct->last_meal_mutex);
-		print_routine(philo_struct, "is eating");
-		safe_usleep(philo_struct->params, philo_struct->params->time_to_eat);
+		eating(philo_struct);
 		pthread_mutex_lock(&philo_struct->have_eaten_mutex);
 		philo_struct->have_eaten++;
 		pthread_mutex_unlock(&philo_struct->have_eaten_mutex);
@@ -101,6 +85,24 @@ void	*philo_does(void *args)
 		safe_usleep(philo_struct->params, philo_struct->params->time_to_sleep);
 	}
 	return (NULL);
+}
+
+bool	join(t_parse	*parse, t_philo *philo_struct)
+{
+	int	i;
+
+	i = 0;
+	if (pthread_create(&parse->death, NULL, death, philo_struct))
+		return (false);
+	while (i < parse->nbr_of_philo && parse->nbr_of_philo > 1)
+	{
+		if (pthread_join(philo_struct[i].thread, NULL))
+			return (false);
+		i++;
+	}
+	if (pthread_join(parse->death, NULL))
+		return (false);
+	return (true);
 }
 
 bool	create_threads(t_parse	*parse, t_philo *philo_struct)
@@ -127,16 +129,7 @@ bool	create_threads(t_parse	*parse, t_philo *philo_struct)
 			return (false);
 		i++;
 	}
-	i = 0;
-	if (pthread_create(&parse->death, NULL, death, philo_struct))
-		return (false);
-	while (i < parse->nbr_of_philo && parse->nbr_of_philo > 1)
-	{
-		if (pthread_join(philo_struct[i].thread, NULL))
-			return (false);
-		i++;
-	}
-	if (pthread_join(parse->death, NULL))
+	if (!join(parse, philo_struct))
 		return (false);
 	return (true);
 }
