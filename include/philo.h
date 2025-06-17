@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 17:57:01 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/13 17:05:32 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/17 15:44:41 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,9 @@ typedef struct s_philo
 	t_parse			*params;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
-	pthread_mutex_t	*last_meal_mutex;
+	pthread_mutex_t	last_meal_mutex;
 	ssize_t			have_eaten;
-	pthread_mutex_t	*have_eaten_mutex;
+	pthread_mutex_t	have_eaten_mutex;
 }	t_philo;
 
 

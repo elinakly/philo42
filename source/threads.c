@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 20:29:26 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/13 18:04:16 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/17 17:43:16 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,15 @@
 
 bool	died(t_philo	*philo_struct, int *done_eating, int i)
 {
-	pthread_mutex_lock(philo_struct[i].have_eaten_mutex);
+	pthread_mutex_lock(&philo_struct[i].have_eaten_mutex);
 	if (philo_struct[i].have_eaten >= philo_struct[i].params->eats_time)
 		(*done_eating)++;
-	pthread_mutex_unlock(philo_struct[i].have_eaten_mutex);
-	pthread_mutex_lock(philo_struct[i].last_meal_mutex);
+	pthread_mutex_unlock(&philo_struct[i].have_eaten_mutex);
+	pthread_mutex_lock(&philo_struct[i].last_meal_mutex);
 	if (time_now() - philo_struct[i].last_meal
 		> philo_struct[i].params->time_to_die)
 	{
-		pthread_mutex_unlock(philo_struct[i].last_meal_mutex);
+		pthread_mutex_unlock(&philo_struct[i].last_meal_mutex);
 		pthread_mutex_lock(philo_struct->params->death_mutex);
 		philo_struct->params->terminate = true;
 		pthread_mutex_unlock(philo_struct->params->death_mutex);
@@ -30,7 +30,7 @@ bool	died(t_philo	*philo_struct, int *done_eating, int i)
 		return (false);
 	}
 	else
-		pthread_mutex_unlock(philo_struct[i].last_meal_mutex);
+		pthread_mutex_unlock(&philo_struct[i].last_meal_mutex);
 	return (true);
 }
 
@@ -87,17 +87,14 @@ void	*philo_does(void *args)
 			pthread_mutex_lock(philo_struct->right_fork);
 			print_routine(philo_struct, "has taken a fork");
 		}
-		pthread_mutex_lock(philo_struct->last_meal_mutex);
+		pthread_mutex_lock(&philo_struct->last_meal_mutex);
 		philo_struct->last_meal = time_now();
-		pthread_mutex_unlock(philo_struct->last_meal_mutex);
+		pthread_mutex_unlock(&philo_struct->last_meal_mutex);
 		print_routine(philo_struct, "is eating");
-		pthread_mutex_lock(philo_struct->have_eaten_mutex);
-		philo_struct->have_eaten++;
-		pthread_mutex_unlock(philo_struct->have_eaten_mutex);
 		safe_usleep(philo_struct->params, philo_struct->params->time_to_eat);
-		pthread_mutex_lock(philo_struct->last_meal_mutex);
-		philo_struct->last_meal = time_now();
-		pthread_mutex_unlock(philo_struct->last_meal_mutex);
+		pthread_mutex_lock(&philo_struct->have_eaten_mutex);
+		philo_struct->have_eaten++;
+		pthread_mutex_unlock(&philo_struct->have_eaten_mutex);
 		pthread_mutex_unlock(philo_struct->right_fork);
 		pthread_mutex_unlock(philo_struct->left_fork);
 		print_routine(philo_struct, "is sleeping");
@@ -117,17 +114,13 @@ bool	create_threads(t_parse	*parse, t_philo *philo_struct)
 		philo_struct[i].id = i + 1;
 		philo_struct[i].params = parse;
 		philo_struct[i].left_fork = &parse->forks[i];
-		philo_struct[i].last_meal = parse->start_time;
 		philo_struct[i].right_fork = &parse->forks[(i + 1)
 			% parse->nbr_of_philo];
-		philo_struct[i].last_meal_mutex = malloc(sizeof(pthread_mutex_t));
-		if (!philo_struct[i].last_meal_mutex
-			|| pthread_mutex_init(philo_struct[i].last_meal_mutex, NULL))
-			return (false);
+		philo_struct[i].last_meal = parse->start_time;
 		philo_struct[i].have_eaten = 0;
-		philo_struct[i].have_eaten_mutex = malloc(sizeof(pthread_mutex_t));
-		if (!philo_struct[i].have_eaten_mutex
-			|| pthread_mutex_init(philo_struct[i].have_eaten_mutex, NULL))
+		if (pthread_mutex_init(&philo_struct[i].last_meal_mutex, NULL))
+			return (false);
+		if (pthread_mutex_init(&philo_struct[i].have_eaten_mutex, NULL))
 			return (false);
 		if (pthread_create(&philo_struct[i].thread, NULL,
 				philo_does, &philo_struct[i]))
@@ -137,7 +130,7 @@ bool	create_threads(t_parse	*parse, t_philo *philo_struct)
 	i = 0;
 	if (pthread_create(&parse->death, NULL, death, philo_struct))
 		return (false);
-	while (i < parse->nbr_of_philo)
+	while (i < parse->nbr_of_philo && parse->nbr_of_philo > 1)
 	{
 		if (pthread_join(philo_struct[i].thread, NULL))
 			return (false);
