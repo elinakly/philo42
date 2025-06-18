@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 17:57:01 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/17 15:44:41 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/18 16:46:03 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ typedef struct s_philo
 	pthread_mutex_t	have_eaten_mutex;
 }	t_philo;
 
-
 int			ft_atoi(const char *str);
 bool		ft_parse(t_parse *parse, int argc, char **argv);
 bool		malloc_philo(t_parse	*parse, t_philo	**philo_struct);
@@ -63,4 +62,5 @@ bool		malloc_philo(t_parse	*parse, t_philo	**philo_struct);
 bool		is_everyone_alive(t_parse *params);
 void		safe_usleep(t_parse *params, long long duration_ms);
 bool		died(t_philo	*philo_struct, int *done_eating, int i);
+bool		if_one(t_philo	*philo_struct);
 #endif

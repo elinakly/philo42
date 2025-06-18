@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 20:29:26 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/17 17:43:16 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/18 16:44:37 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,14 @@ void	*death(void *args)
 			print_routine(&philo_struct[0], "Eats Limit");
 			return (NULL);
 		}
-		usleep(1000);
+		usleep(100);
 	}
 }
 
 void	eating(t_philo	*philo_struct)
 {
+	if (if_one(philo_struct))
+		return ;
 	if (philo_struct->id % 2 == 0)
 	{
 		pthread_mutex_lock(philo_struct->right_fork);
@@ -69,9 +71,11 @@ void	*philo_does(void *args)
 	t_philo	*philo_struct;
 
 	philo_struct = (t_philo *)args;
-	// usleep((philo_struct->id % 2) * (philo_struct->params->time_to_eat
-	// 		* 1000));
-	usleep((philo_struct->id - 1) * 2000);
+	if (philo_struct->params->nbr_of_philo > 50)
+		usleep((philo_struct->id % 2) * (philo_struct->params->time_to_eat
+				* 100));
+	else
+		usleep((philo_struct->id - 1) * 1000);
 	while (is_everyone_alive(philo_struct->params))
 	{
 		print_routine(philo_struct, "is thinking");
@@ -94,7 +98,7 @@ bool	join(t_parse	*parse, t_philo *philo_struct)
 	i = 0;
 	if (pthread_create(&parse->death, NULL, death, philo_struct))
 		return (false);
-	while (i < parse->nbr_of_philo && parse->nbr_of_philo > 1)
+	while (i < parse->nbr_of_philo)
 	{
 		if (pthread_join(philo_struct[i].thread, NULL))
 			return (false);
