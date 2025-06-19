@@ -6,13 +6,12 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 17:57:01 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/18 16:46:03 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/19 12:36:17 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
-
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdio.h>
@@ -61,6 +60,7 @@ int			ft_strncmp(const char *s1, const char *s2, size_t n);
 bool		malloc_philo(t_parse	*parse, t_philo	**philo_struct);
 bool		is_everyone_alive(t_parse *params);
 void		safe_usleep(t_parse *params, long long duration_ms);
-bool		died(t_philo	*philo_struct, int *done_eating, int i);
+bool		init_philo_thread(t_parse *parse, t_philo *philo, int i);
+void		philo_take_forks(t_philo *philo_struct);
 bool		if_one(t_philo	*philo_struct);
 #endif
