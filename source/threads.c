@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/04 20:29:26 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/19 12:37:58 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/19 15:54:08 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,9 @@ void	*philo_does(void *args)
 
 	philo_struct = (t_philo *)args;
 	usleep((philo_struct->id % 2) * (philo_struct->params->time_to_eat * 100));
+	pthread_mutex_lock(&philo_struct->last_meal_mutex);
+	philo_struct->last_meal = time_now();
+	pthread_mutex_unlock(&philo_struct->last_meal_mutex);
 	while (is_everyone_alive(philo_struct->params))
 	{
 		print_routine(philo_struct, "is thinking");

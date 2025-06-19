@@ -6,7 +6,7 @@
 /*   By: eklymova <eklymova@student.codam.nl>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/30 19:35:34 by eklymova          #+#    #+#             */
-/*   Updated: 2025/06/17 16:56:46 by eklymova         ###   ########.fr       */
+/*   Updated: 2025/06/19 15:44:35 by eklymova         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ bool	malloc_forks(t_parse *parse)
 	return (true);
 }
 
-bool	ft_parse(t_parse *parse, int argc, char **argv)
+bool	init(t_parse *parse, int argc, char **argv)
 {
 	parse->forks = NULL;
 	parse->print_mutex = NULL;
@@ -49,12 +49,23 @@ bool	ft_parse(t_parse *parse, int argc, char **argv)
 	parse->time_to_eat = ft_atoi(argv[3]);
 	parse->time_to_sleep = ft_atoi(argv[4]);
 	if (argc == 6)
+	{
 		parse->eats_time = ft_atoi(argv[5]);
+		if (parse->eats_time == 0)
+			return (false);
+	}
 	else
 		parse->eats_time = -1;
 	if (parse->nbr_of_philo == -2 || parse->time_to_die == -2
 		|| parse->time_to_eat == -2 || parse->time_to_sleep == -2
 		|| parse->eats_time == -2)
+		return (false);
+	return (true);
+}
+
+bool	ft_parse(t_parse *parse, int argc, char **argv)
+{
+	if (!init(parse, argc, argv))
 		return (false);
 	if (!malloc_forks(parse))
 		return (false);
